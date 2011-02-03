@@ -21,6 +21,12 @@
     <url>http://neo4j.org/</url>
   </organization>
 
+  <scm>
+    <connection>scm:git:git://github.com/neo4j/maven-skin.git</connection>
+    <developerConnection>scm:git:git@github.com:neo4j/maven-skin.git</developerConnection>
+    <url>https://github.com/neo4j/maven-skin</url>
+  </scm>
+
   <licenses>
     <license>
       <name>GNU Affero General Public License, Version 3</name>
