@@ -2,6 +2,7 @@ package org.neo4j.maven.skin.macros;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -24,12 +25,12 @@ public class SourceCodeMacro extends AbstractMacro
     private static final Pattern END_SNIPPET = Pattern.compile( "END SNIPPET:\\s*(\\S+)" );
     private static final String newline = System.getProperty( "line.separator" );
 
-    private static String getBrush( String suffix )
+    private static String getBrush( final String suffix )
     {
         return suffix;
     }
 
-    private static boolean match( String line, Pattern pattern, String id )
+    private static boolean match( final String line, final Pattern pattern, final String id )
     {
         Matcher match = pattern.matcher( line );
         return match.find() && id.equals( match.group( 1 ) );
@@ -40,7 +41,7 @@ public class SourceCodeMacro extends AbstractMacro
         private final String brush;
         private final BufferedReader reader;
 
-        SourceCode( URI uri ) throws MacroExecutionException
+        SourceCode( final URI uri ) throws MacroExecutionException
         {
             try
             {
@@ -55,7 +56,7 @@ public class SourceCodeMacro extends AbstractMacro
             brush = getBrush( path.substring( path.lastIndexOf( '.' ) + 1 ) );
         }
 
-        private void emit( Sink sink, String content )
+        private void emit( final Sink sink, final String content )
         {
             sink.rawText( "<div class=\"source\">" );
             if ( brush == null )
@@ -100,17 +101,17 @@ public class SourceCodeMacro extends AbstractMacro
             return result.toString();
         }
 
-        void emitFile( Sink sink ) throws MacroExecutionException
+        void emitFile( final Sink sink ) throws MacroExecutionException
         {
             emit( sink, readAll() );
         }
 
-        void emitSnippet( String id, Sink sink ) throws MacroExecutionException
+        void emitSnippet( final String id, final Sink sink ) throws MacroExecutionException
         {
             emit( sink, findSnippet( id ) );
         }
 
-        private String findSnippet( String id ) throws MacroExecutionException
+        private String findSnippet( final String id ) throws MacroExecutionException
         {
             String line;
             while ( ( line = readLine() ) != null )
@@ -132,8 +133,8 @@ public class SourceCodeMacro extends AbstractMacro
         }
     }
 
-    public void execute( Sink sink, MacroRequest request )
-            throws MacroExecutionException
+    public void execute( final Sink sink, final MacroRequest request )
+    throws MacroExecutionException
     {
         SourceCode code = new SourceCode( getUri( request ) );
         final String snippet;
@@ -155,7 +156,7 @@ public class SourceCodeMacro extends AbstractMacro
         }
     }
 
-    private URI getUri( MacroRequest request ) throws MacroExecutionException
+    private URI getUri( final MacroRequest request ) throws MacroExecutionException
     {
         Object uri = request.getParameter( "uri" );
         Object file = request.getParameter( "file" );
@@ -163,7 +164,7 @@ public class SourceCodeMacro extends AbstractMacro
         {
             throw new MacroExecutionException(
                     "Exectly one of the parameters \"uri\" and "
-                            + "\"file\" must be specified." );
+                    + "\"file\" must be specified." );
         }
         else if ( uri != null )
         {
@@ -188,8 +189,35 @@ public class SourceCodeMacro extends AbstractMacro
                 }
                 if ( !path.exists() )
                 {
+                    // workaround for bug in doxia
+                    // where the basedir gets wrong in
+                    // multi-module builds
+                    File dir = request.getBasedir();
+                    if ( dir.isDirectory() )
+                    {
+                        FileFilter filter = new FileFilter()
+                        {
+                            @Override
+                            public boolean accept( final File pathname )
+                            {
+                                return pathname.isDirectory()
+                                && !pathname.getName().startsWith( "." );
+                            }
+                        };
+
+                        // just guess the file is one directory level deeper
+                        for ( File aDir : dir.listFiles( filter ) )
+                        {
+                            path = new File( aDir, (String) file );
+                            if ( path.exists() )
+                            {
+                                // let's just hope this is the correct file
+                                return path.toURI();
+                            }
+                        }
+                    }
                     throw new MacroExecutionException( "No such file: \""
-                                                       + file + "\"" );
+                            + file + "\"" );
                 }
                 return path.toURI();
             }
