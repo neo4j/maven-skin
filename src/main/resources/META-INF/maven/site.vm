@@ -491,9 +491,7 @@
       SyntaxHighlighter.all();
     </script>
     <!-- Crowdsound feedback thingy -->
-    <link rel="stylesheet" type="text/css" href="http://neo4j.org/wp-content/themes/neo4j-sandbox/crowdsound-right.css" />
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-    <script type="text/javascript" src="http://neo4j.org/wp-content/themes/neo4j-sandbox/custom-crowd.js"></script>
     
   </head>
   <body class="composite" onload="highlightSyntax()">
@@ -535,12 +533,5 @@
     </div>
     #analytics ( )
 
-    <!-- Crowdsound stuff -->
-    <div id="crowsdound-footer">
-	    <a id="crowdsound-activate-popup"></a>
-    </div>
-
-    <script type='text/javascript' src='http://crowdsound.com/widgets/popup?&aid=4359'></script>
-    
   </body>
 </html>
