@@ -13,7 +13,7 @@
   <url>http://components.neo4j.org/</url>
   <groupId>org.neo4j.maven.skins</groupId>
   <artifactId>default-skin</artifactId>
-  <version>2</version>
+  <version>3-SNAPSHOT</version>
   <inceptionYear>2008</inceptionYear>
 
   <organization>
